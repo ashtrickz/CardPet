@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class Card : MonoBehaviour, 
     IDragHandler, IBeginDragHandler, IEndDragHandler,
     IPointerEnterHandler, IPointerExitHandler, IPointerUpHandler, IPointerDownHandler
 {
-
     [Header("Card Parameters")] 
     [SerializeField] private float moveSpeedLimit = 2f;
     [SerializeField] private Vector3 offset;
@@ -17,64 +17,64 @@ public class Card : MonoBehaviour,
     [Header("Events"), Space]
     public UnityEvent<Card> OnPointerEnterEvent;
     public UnityEvent<Card> OnPointerExitEvent;
+    
     public UnityEvent<Card, bool> OnPointerUpEvent;
     public UnityEvent<Card> OnPointerDownEvent;
+    
     public UnityEvent<Card> OnBeginDragEvent;
     public UnityEvent<Card> OnEndDragEvent;
+    
     public UnityEvent<Card, bool> OnSelectEvent;
-
-    [Space, SerializeField] private bool instantiateVisual = true;
-    [Space, SerializeField] private CardVisual cardVisual;
-    [Space, SerializeField] private CardVisual visualPrefab;
-    private CardVisualHandler _visualHandler;
     
-    private Canvas _canvas;
-    private Image _image;
-    
+    [Header("Other")]
+    [Space, SerializeField] private bool initDrawer = true;
+    [Space, SerializeField] private CardDrawer cardDrawer;
+    [Space, SerializeField] private CardDrawer drawerPrefab;
+   
     public bool selected = false;
     public float selectionOffset;
+    
+    private CardVisualHandler _visualHandler;
+    private Canvas _canvas;
+    private Image _image;
     
     private bool _isDragging = false;
     private bool _wasDragged = false;
     private bool _isHovering = false;
-
-    public CardVisual Visual => cardVisual;
-    
-    public bool IsDragging => _isDragging;
-    public bool WasDragged => _wasDragged;
-    public bool IsHovering => _isHovering;
     
     private float _pointerDownTime;
     private float _pointerUpTime;
+    
+    public CardDrawer Drawer => cardDrawer;
+    public bool IsDragging => _isDragging;
+    public bool WasDragged => _wasDragged;
+    public bool IsHovering => _isHovering;
     
     void Start()
     {
         _canvas = GetComponentInParent<Canvas>();
         _image = GetComponent<Image>();
         
-        if (!instantiateVisual)
+        if (!initDrawer)
             return;
         
         _visualHandler = FindObjectOfType<CardVisualHandler>();
-        cardVisual = Instantiate(visualPrefab, _visualHandler 
+        cardDrawer = Instantiate(drawerPrefab, _visualHandler 
             ? _visualHandler.transform 
             : _canvas.transform)
-            .GetComponent<CardVisual>();
-        cardVisual.Initialize(this);
+            .GetComponent<CardDrawer>();
+        cardDrawer.Initialize(this);
     }
     
     void Update()
     {
         ClampPosition();
-        
-        if (_isDragging)
-        {
-            Vector2 targetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition) - offset;
-            Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
-            Vector2 velocity = direction * Mathf.Min(moveSpeedLimit, Vector2.Distance(transform.position, targetPosition) / Time.deltaTime);
-            transform.Translate(velocity * Time.deltaTime);
-        }
-        
+
+        if (!_isDragging) return;
+        Vector2 targetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition) - offset;
+        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
+        Vector2 velocity = direction * Mathf.Min(moveSpeedLimit, Vector2.Distance(transform.position, targetPosition) / Time.deltaTime);
+        transform.Translate(velocity * Time.deltaTime);
     }
 
     void ClampPosition()
@@ -141,10 +141,10 @@ public class Card : MonoBehaviour,
         selected = !selected;
         OnSelectEvent.Invoke(this, selected);
 
-        // if (selected)
-        //     transform.localPosition += (cardVisual.transform.up * selectionOffset);
-        // else
-        //     transform.localPosition = Vector3.zero;
+         if (selected)
+             transform.localPosition += (cardDrawer.transform.up * selectionOffset);
+         else
+             transform.localPosition = Vector3.zero;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -164,7 +164,7 @@ public class Card : MonoBehaviour,
         {
             selected = false;
             if (selected)
-                transform.localPosition += (cardVisual.transform.up * 50);
+                transform.localPosition += (cardDrawer.transform.up * 50);
             else
                 transform.localPosition = Vector3.zero;
         }
@@ -190,7 +190,7 @@ public class Card : MonoBehaviour,
 
     private void OnDestroy()
     {
-        if(cardVisual != null)
-            Destroy(cardVisual.gameObject);
+        if(cardDrawer != null)
+            Destroy(cardDrawer.gameObject);
     }
 }

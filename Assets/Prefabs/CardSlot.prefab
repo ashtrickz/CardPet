@@ -82,9 +82,9 @@ MonoBehaviour:
   OnSelectEvent:
     m_PersistentCalls:
       m_Calls: []
-  instantiateVisual: 1
-  cardVisual: {fileID: 0}
-  visualPrefab: {fileID: 0}
+  initDrawer: 1
+  cardDrawer: {fileID: 0}
+  drawerPrefab: {fileID: 1353268772194535983, guid: 6c771090d8dee204bbef8d305e9e2194, type: 3}
   selected: 0
   selectionOffset: 0
 --- !u!114 &4645783564308022257

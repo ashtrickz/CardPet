@@ -103,16 +103,16 @@ public class CardHolder : MonoBehaviour
 
         _isCrossing = false;
 
-        if (Cards[index].Visual == null)
+        if (Cards[index].Drawer == null)
             return;
         
         var swapIsRight = Cards[index].ParentIndex > selectedCard.ParentIndex;
-        Cards[index].Visual.Swap(swapIsRight ? -1 : 1);
+        Cards[index].Drawer.Swap(swapIsRight ? -1 : 1);
         
         //Updated Visual Indexes
         foreach (Card card in Cards)
         {
-            card.Visual.UpdateIndex(transform.childCount);
+            card.Drawer.UpdateIndex(transform.childCount);
         }
     }
     
