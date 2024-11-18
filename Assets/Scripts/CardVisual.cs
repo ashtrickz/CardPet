@@ -101,7 +101,6 @@ private bool initalize = false;
         SmoothFollow();
         FollowRotation();
         CardTilt();
-
     }
 
     private void HandPositioning()
@@ -193,12 +192,16 @@ private bool initalize = false;
 
         DOTween.Kill(2, true);
         shakeParent.DOPunchRotation(Vector3.forward * hoverPunchAngle, hoverTransition, 20, 1).SetId(2);
+
+        canvas.overrideSorting = true;
     }
 
     private void PointerExit(Card card)
     {
         if (!parentCard.WasDragged)
             transform.DOScale(1, scaleTransition).SetEase(scaleEase);
+
+        canvas.overrideSorting = false;
     }
 
     private void PointerUp(Card card, bool longPress)

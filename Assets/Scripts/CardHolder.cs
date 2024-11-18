@@ -34,7 +34,7 @@ public class CardHolder : MonoBehaviour
             card.OnBeginDragEvent.AddListener(OnBeginDrag);
             card.OnEndDragEvent.AddListener(OnEndDrag);
             card.OnSelectEvent.AddListener(OnSelect);
-            card.name = "Card " + cardCount.ToString();
+            card.name = cardCount.ToString();
             cardCount++;
         }
     }
